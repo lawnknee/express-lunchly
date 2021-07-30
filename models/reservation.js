@@ -14,8 +14,8 @@ class Reservation {
   constructor({ id, customerId, numGuests, startAt, notes }) {
     this.id = id;
     this.customerId = customerId;
-    this._numGuests = numGuests;
-    this._startAt = startAt;
+    this.numGuests = numGuests;
+    this.startAt = startAt;
     this.notes = notes;
   }
 
@@ -92,9 +92,6 @@ class Reservation {
   /** save this reservation */
 
   async save() {
-    this.numGuests = this._numGuests;
-    this.startAt = this._startAt;
-
     if (this.id === undefined) {
       const result = await db.query(
         `INSERT INTO reservations (customer_id, start_at, num_guests, notes)

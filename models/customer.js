@@ -13,7 +13,7 @@ class Customer {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
-    this._phone = phone;
+    this.phone = phone;
     this.notes = notes;
   }
 
@@ -24,9 +24,9 @@ class Customer {
   get phone() {
     return this._phone;
   }
-
+  
   set phone(numStr) {
-    if (numStr.length > 0 && numStr.length < 10) throw new BadRequestError();
+    if (numStr && (numStr.length > 0 && numStr.length < 10)) throw new BadRequestError();
     this._phone = numStr;
   }
   /** find all customers. */
@@ -80,7 +80,6 @@ class Customer {
   async save() {
     
     if (this.id === undefined) {
-      this.phone = this._phone;
       const result = await db.query(
             `INSERT INTO customers (first_name, last_name, phone, notes)
              VALUES ($1, $2, $3, $4)
