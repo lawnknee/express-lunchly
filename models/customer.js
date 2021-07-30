@@ -62,7 +62,7 @@ class Customer {
     return await Reservation.getReservationsForCustomer(this.id);
   }
 
-  /** save this customer. */
+  /** save this customer to database. */
 
   async save() {
     if (this.id === undefined) {
@@ -91,7 +91,9 @@ class Customer {
     }
   }
 
-  static async search(query) {
+  /** searches for a customer like the given searchName */
+
+  static async search(searchName) {
     const results = await db.query(
       `SELECT id,
               first_name AS "firstName",
@@ -99,11 +101,31 @@ class Customer {
               phone,
               notes
        FROM customers
-       WHERE first_name LIKE $1 OR last_name LIKE $1
+       WHERE first_name ILIKE $1 OR last_name ILIKE $1
        ORDER BY last_name, first_name`,
-       ['%' + query + '%']
+       ['%' + searchName + '%']
     );
-    console.log(results.rows);
+
+    return results.rows.map(c => new Customer(c));
+  }
+
+  /** find top 10 customers based on num of reservations
+   *  ordered by num, then first name. */
+
+  static async top() {
+    const results = await db.query(
+          `SELECT c.id,
+                  c.first_name AS "firstName",
+                  c.last_name  AS "lastName",
+                  c.phone,
+                  c.notes
+           FROM customers as c
+              JOIN reservations
+                  ON c.id = customer_id
+           GROUP BY c.id 
+           ORDER BY count(c.id) DESC, c.first_name
+           LIMIT 10`,
+    );
     return results.rows.map(c => new Customer(c));
   }
 
