@@ -90,6 +90,26 @@ class Customer {
       );
     }
   }
+
+  static async search(query) {
+    const results = await db.query(
+      `SELECT id,
+              first_name AS "firstName",
+              last_name  AS "lastName",
+              phone,
+              notes
+       FROM customers
+       WHERE first_name LIKE $1 OR last_name LIKE $1
+       ORDER BY last_name, first_name`,
+       ['%' + query + '%']
+    );
+    console.log(results.rows);
+    return results.rows.map(c => new Customer(c));
+  }
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
 }
 
 module.exports = Customer;
