@@ -3,6 +3,7 @@
 /** Customer for Lunchly */
 
 const db = require("../db");
+const { BadRequestError } = require("../expressError");
 const Reservation = require("./reservation");
 
 /** Customer of the restaurant. */
@@ -12,10 +13,22 @@ class Customer {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
-    this.phone = phone;
+    this._phone = phone;
     this.notes = notes;
   }
 
+/** gets and sets customer phone number. Throws error if phone number is 
+ * less than 10 digits
+ */
+
+  get phone() {
+    return this._phone;
+  }
+
+  set phone(numStr) {
+    if (numStr.length > 0 && numStr.length < 10) throw new BadRequestError();
+    this._phone = numStr;
+  }
   /** find all customers. */
 
   static async all() {
@@ -65,7 +78,9 @@ class Customer {
   /** save this customer to database. */
 
   async save() {
+    
     if (this.id === undefined) {
+      this.phone = this._phone;
       const result = await db.query(
             `INSERT INTO customers (first_name, last_name, phone, notes)
              VALUES ($1, $2, $3, $4)
@@ -129,7 +144,7 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
-  fullName() {
+  get fullName() {
     return `${this.firstName} ${this.lastName}`;
   }
 }
