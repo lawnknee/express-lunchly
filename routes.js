@@ -34,6 +34,7 @@ router.get("/add/", async function (req, res, next) {
 router.post("/add/", async function (req, res, next) {
   const { firstName, lastName, phone, notes } = req.body;
   const customer = new Customer({ firstName, lastName, phone, notes });
+  // use getter/setter in the constructor
   await customer.save();
 
   return res.redirect(`/${customer.id}/`);
@@ -87,6 +88,28 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   await reservation.save();
 
   return res.redirect(`/${customerId}/`);
+});
+
+
+/** Show form to edit a reservation. */
+
+router.get("/reservation/:id", async function (req, res, next) {
+  const reservation = await Reservation.get(req.params.id);
+
+  res.render("reservation_edit_form.html", { reservation });
+});
+
+
+/** Handle editing a reservation. */
+
+router.post("/reservation/:id/", async function (req, res, next) {
+  const reservation = await Reservation.get(req.params.id);
+  reservation.startAt = new Date(req.body.startAt);
+  reservation.numGuests = req.body.numGuests;
+  reservation.notes = req.body.notes;
+  await reservation.save();
+
+  return res.redirect(`/${reservation.customerId}/`);
 });
 
 /** Top Customers: show list of our top 10 customers,
