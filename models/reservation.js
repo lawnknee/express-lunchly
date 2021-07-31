@@ -41,6 +41,18 @@ class Reservation {
     this._startAt = date;
   }
 
+  /** gets and sets customer ID: can only set ID once. */
+
+  get customerId() {
+    return this._customerId;
+  }
+
+  set customerId(id) {
+    if (this._customerId && this._customerId !== id)
+      throw new Error("Cannot change customer ID");
+    this._customerId = id;
+  }
+
   /** formatter for startAt */
 
   getFormattedStartAt() {
